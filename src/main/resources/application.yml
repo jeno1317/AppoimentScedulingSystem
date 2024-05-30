@@ -2,7 +2,7 @@ debug: true
 server:
     ssl:
         key-store: classpath:keystore.p12
-        key-store-password: jenil@1317
+        key-store-password: jenil@123
         keyAlias: your_alias
         keyStoreType: PKCS12
 spring:

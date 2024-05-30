@@ -1,0 +1,15 @@
+debug: true
+server:
+    ssl:
+        key-store: classpath:keystore.p12
+        key-store-password: jenil@1317
+        keyAlias: your_alias
+        keyStoreType: PKCS12
+spring:
+    application:
+        name: AppointmentSchedulingSystem
+    data:
+        mongodb:
+            database: AppointmentSchedulingSystem
+            host: localhost
+            port: 27017

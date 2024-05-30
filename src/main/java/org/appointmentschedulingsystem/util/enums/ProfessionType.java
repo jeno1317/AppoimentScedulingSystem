@@ -1,0 +1,5 @@
+package org.appointmentschedulingsystem.util.enums;
+
+public enum ProfessionType {
+        DOCTOR, LAWYER, ENGINEER, ACCOUNTANT, TEACHER, JOURNALIST, BUSINESSANALYST, SOFTWAREDEVELOPER, MARKETINGPROFESSIONAL, PARAMEDIC
+}

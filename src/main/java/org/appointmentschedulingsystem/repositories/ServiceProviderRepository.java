@@ -15,12 +15,13 @@ public interface ServiceProviderRepository extends MongoRepository<ServiceProvid
     }
 
     List<ServiceProvider> findByProfessionName(ProfessionType professionName);
-    //@Query("{'location': { $near: { $geometry: { type: 'Point', coordinates: [ ?0, ?1 ] }, $maxDistance: ?2 } } }")
+
     public List<ServiceProvider> findByLocationNear(Point point, Distance distance);
+
+    ServiceProvider findByEmail(String email);
 
     @Query("{'location': { $near: { $geometry: { type: 'Point', coordinates:  ?0  }, $maxDistance: ?1 } } }")
     List<ServiceProvider> findByLocationNear(List<Double> coordinates, int maxDistance);
-    ServiceProvider findByEmail(String email);
 
 }
 

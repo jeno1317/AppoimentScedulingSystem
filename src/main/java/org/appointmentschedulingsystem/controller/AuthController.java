@@ -1,5 +1,6 @@
 package org.appointmentschedulingsystem.controller;
 
+import lombok.AllArgsConstructor;
 import org.appointmentschedulingsystem.dtos.JwtResponse;
 import org.appointmentschedulingsystem.dtos.JwtRequest;
 import org.appointmentschedulingsystem.security.authentication.JwtHelper;
@@ -17,10 +18,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-
-//ToDo: Use final references for dependencies
+@AllArgsConstructor
 @RestController
 @RequestMapping("/auth")
+
 public class AuthController {
 
     private final UserDetailsService userDetailsService;
@@ -29,19 +30,6 @@ public class AuthController {
     private final UserService userService;
 
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
-    public AuthController(
-            UserDetailsService userDetailsService,
-            AuthenticationManager manager,
-            JwtHelper helper,
-            UserService userService,
-            UserRepository userRepository
-    ) {
-        this.userDetailsService = userDetailsService;
-        this.manager = manager;
-        this.helper = helper;
-        this.userService = userService;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {

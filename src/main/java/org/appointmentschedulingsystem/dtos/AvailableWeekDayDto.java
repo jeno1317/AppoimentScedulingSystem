@@ -13,12 +13,13 @@ import java.util.List;
 public class AvailableWeekDayDto {
 
     private String day;
-    private List<BreakTimeDto> breakTime;
 
     @ValueConverter(LocalDateTimeConverter.class)
     private LocalTime fromTime;
 
     @ValueConverter(LocalDateTimeConverter.class)
     private LocalTime toTime;
+
+    private List<BreakTimeDto> breakTime;
 
 }

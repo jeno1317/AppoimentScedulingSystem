@@ -14,16 +14,17 @@ import org.appointmentschedulingsystem.mapper.UserMapper;
 import org.appointmentschedulingsystem.repositories.UserRepository;
 import org.appointmentschedulingsystem.util.enums.ProfessionType;
 import org.appointmentschedulingsystem.util.enums.Role;
-import org.appointmentschedulingsystem.util.exception.CustomException;
+import org.appointmentschedulingsystem.util.exception.Exception;
 import org.appointmentschedulingsystem.util.validation.UserValidation;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.appointmentschedulingsystem.repositories.ServiceProviderRepository;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Service
@@ -36,7 +37,7 @@ public class UserService extends UserValidation {
     private final PasswordEncoder passwordEncoder;
 
     public List<UserDto> getUserDetail(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User Not Found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new Exception("User Not Found"));
         List<Appointment> appointments = user.getBookAppointments();
         for (Appointment appointment : appointments) {
             appointment.setUid(user.getId());
@@ -48,7 +49,7 @@ public class UserService extends UserValidation {
     public List<UserDto> getAllUserDetail() {
         List<User> all = userRepository.findAll();
         if (all.isEmpty()) {
-            throw new CustomException("User detail not found !!");
+            throw new Exception("User detail not found !!");
         }
         return all.stream().map(UserMapper.INSTANCE::UserToUserDTO).toList();
     }
@@ -57,7 +58,7 @@ public class UserService extends UserValidation {
         User user = UserMapper.INSTANCE.MapUserToUser(userDto);
         User checkExistingUser = userRepository.findByEmail(user.getEmail());
         if (checkExistingUser != null) {
-            throw new CustomException("User already exists");
+            throw new Exception("User already exists");
         }
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -71,32 +72,25 @@ public class UserService extends UserValidation {
         return UserMapper.INSTANCE.UserToUserDTO(user);
     }
 
-    public UserDto userUpdate(String id, UserDto userDto) {
+    public UserDto userUpdate(String email, UserDto userDto) {
         User user = UserMapper.INSTANCE.MapUserToUser(userDto);
-
-        if (user.getId().equals(id)) {
-            user.setFirstName(user.getFirstName());
-            user.setLastName(user.getLastName());
-            user.setEmail(user.getEmail());
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setAddress(user.getAddress());
-            user.setPhoneNumber(user.getPhoneNumber());
-            user.setLocation(user.getLocation());
-            user.setRole(Role.USER);
-            userValidation(user);
-            userRepository.save(user);
-        } else {
-            throw new CustomException("User not exists");
+        User byEmail = userRepository.findByEmail(email);
+        if (email == null) {
+            throw new Exception("User not found !!");
         }
+        User update = UserMapper.INSTANCE.update(userDto, byEmail);
+        user.setRole(Role.USER);
+        userValidation(user);
+        userRepository.save(update);
         return UserMapper.INSTANCE.UserToUserDTO(user);
     }
 
     public boolean deleteUser(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User Not Found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new Exception("User Not Found"));
         List<Appointment> appointments = user.getBookAppointments();
         for (Appointment appointment : appointments) {
             ServiceProvider serviceProvider = serviceProviderRepository.findById(appointment.getSid())
-                    .orElseThrow(() -> new CustomException("Service Provider Not Found"));
+                    .orElseThrow(() -> new Exception("Service Provider Not Found"));
             List<Appointment> serviceAppointments = serviceProvider.getAppointments();
             serviceAppointments.removeIf(appointment1 -> appointment1.getId().equals(appointment.getId()));
             serviceProviderRepository.save(serviceProvider);
@@ -107,7 +101,7 @@ public class UserService extends UserValidation {
 
     public LocationDto addLocation(String id, LocationDto locationDTO) {
         Location location = LocationMapper.INSTANCE.locationDTOToLocation(locationDTO);
-        User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User does not exist"));
+        User user = userRepository.findById(id).orElseThrow(() -> new Exception("User does not exist"));
         user.setLocation(location);
         userRepository.save(user);
         return LocationMapper.INSTANCE.locationToLocationDTO(location);
@@ -115,7 +109,7 @@ public class UserService extends UserValidation {
 
     public LocationDto updateLocation(String id, LocationDto locationDto) {
         Location location = LocationMapper.INSTANCE.locationDTOToLocation(locationDto);
-        User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User does not exist"));
+        User user = userRepository.findById(id).orElseThrow(() -> new Exception("User does not exist"));
         if (user.getId().equals(id)) {
             location.setCoordinates(location.getCoordinates());
             user.setLocation(location);
@@ -125,7 +119,7 @@ public class UserService extends UserValidation {
     }
 
     public boolean deleteLocation(String id, String type) {
-        User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User does not exist"));
+        User user = userRepository.findById(id).orElseThrow(() -> new Exception("User does not exist"));
         Location location = user.getLocation();
         if (location != null && location.getType().equals(type)) {
             location.setCoordinates(Arrays.asList(0.0, 0.0));
@@ -135,22 +129,30 @@ public class UserService extends UserValidation {
     }
 
     public List<ServiceProviderDto> findNearbyServiceProviders(
-            String id,
+            String email,
             ProfessionType professionType,
             int maxDistance
     ) {
-        User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User does not exist"));
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new Exception("User Not Found !!");
+        }
         Location location = user.getLocation();
         List<Double> coordinates = location.getCoordinates();
         List<ServiceProvider> nearbyServiceProviders = serviceProviderRepository
                 .findByLocationNear(coordinates, maxDistance);
-        List<ServiceProvider> result = new ArrayList<>();
-        for (ServiceProvider serviceProvider : nearbyServiceProviders) {
-            if (serviceProvider.getProfessionName().equals(professionType)) {
-                result.add(serviceProvider);
-            }
+        return nearbyServiceProviders.stream()
+                .filter(serviceProvider -> professionType.equals(serviceProvider.getProfessionName()))
+                .map(ServiceProviderMapper.INSTANCE::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public  List<ServiceProviderDto> searchByProfession(ProfessionType professionName) {
+        List<ServiceProvider> serviceProviders =serviceProviderRepository.findByProfessionName(professionName);
+        if (serviceProviders.isEmpty()) {
+            throw new Exception("Record not found for service Provider !!");
         }
-        return result.stream().map(ServiceProviderMapper.INSTANCE::mapToDTO).toList();
+        return serviceProviders.stream().map(ServiceProviderMapper.INSTANCE::mapToDTO).toList();
     }
 
 }

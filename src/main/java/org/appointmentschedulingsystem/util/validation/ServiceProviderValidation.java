@@ -4,7 +4,7 @@ import org.appointmentschedulingsystem.entity.AvailableWeekDay;
 import org.appointmentschedulingsystem.entity.BreakTime;
 import org.appointmentschedulingsystem.entity.OffDay;
 import org.appointmentschedulingsystem.entity.ServiceProvider;
-import org.appointmentschedulingsystem.util.exception.CustomException;
+import org.appointmentschedulingsystem.util.exception.Exception;
 import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,24 +19,24 @@ public class ServiceProviderValidation {
 
     protected static void serviceProviderValidation(ServiceProvider serviceProvider) {
         if (serviceProvider == null) {
-            throw new CustomException("Service provider details cannot be null!");
+            throw new Exception("Service provider details cannot be null!");
         }
 
         String phoneNumber = serviceProvider.getProfessionContactNumber();
         if (phoneNumber == null || phoneNumber.isEmpty()) {
-            throw new CustomException("Professional contact number cannot be null or empty!");
+            throw new Exception("Professional contact number cannot be null or empty!");
         }
 
         Pattern pattern = Pattern.compile(PHONE_NUMBER_REGEX);
         if (!pattern.matcher(phoneNumber).matches()) {
-            throw new CustomException("Please enter a valid phone number!");
+            throw new Exception("Please enter a valid phone number!");
         }
 
         if (!validateEmail(serviceProvider)) {
-            throw new CustomException("Please enter valid email address. example@example.com !!");
+            throw new Exception("Please enter valid email address. example@example.com !!");
         }
         if (!validatePassword(serviceProvider)) {
-            throw new CustomException("Password must contain at least 8 characters," +
+            throw new Exception("Password must contain at least 8 characters," +
                     " including at least one uppercase letter, " +
                     "one lowercase letter, one digit, and one special character");
         }
@@ -48,11 +48,11 @@ public class ServiceProviderValidation {
             LocalTime toTime = availableWeekDay1.getToTime();
 
             if (fromTime.equals(toTime)) {
-                throw new CustomException("FromTime and ToTime cannot be the same");
+                throw new Exception("FromTime and ToTime cannot be the same");
             }
 
             if (fromTime.isAfter(toTime)) {
-                throw new CustomException("FromTime must be before ToTime");
+                throw new Exception("FromTime must be before ToTime");
             }
         }
     }
@@ -65,11 +65,11 @@ public class ServiceProviderValidation {
         Date oneDayPreviousDate = calendar.getTime();
         for (OffDay offDay : offDays) {
             if (offDay.getFromDate().compareTo(oneDayPreviousDate) <= 0) {
-                throw new CustomException("From date must be after today's date");
+                throw new Exception("From date must be after today's date");
             }
 
             if (offDay.getToDate().before(offDay.getFromDate()) && !offDay.getToDate().equals(offDay.getFromDate())) {
-                throw new CustomException("To date must be after or equal to from date");
+                throw new Exception("To date must be after or equal to from date");
             }
         }
 
@@ -88,19 +88,19 @@ public class ServiceProviderValidation {
 
     private void validateBreakTime(BreakTime breakTime) {
         if (breakTime.getToTime1().equals(breakTime.getFromTime1())) {
-            throw new CustomException("Break ToTime and FromTime cannot be the same!");
+            throw new Exception("Break ToTime and FromTime cannot be the same!");
         }
         if (breakTime.getFromTime1().isAfter(breakTime.getToTime1())) {
-            throw new CustomException("Break FromTime must be before ToTime!");
+            throw new Exception("Break FromTime must be before ToTime!");
         }
     }
     private static boolean validatePassword(ServiceProvider serviceProvider) {
         String password = serviceProvider.getPassword();
         if (password == null || password.isEmpty()) {
-            throw new CustomException("Password cannot be null or empty!");
+            throw new Exception("Password cannot be null or empty!");
         }
         if (!password.matches(PASSWORD_REGEX)) {
-            throw new CustomException("Password must contain at least 8 characters, " +
+            throw new Exception("Password must contain at least 8 characters, " +
                     "including at least one uppercase letter, one lowercase letter," +
                     " one digit, and one special character, and must not contain any spaces.");
         }
@@ -109,11 +109,11 @@ public class ServiceProviderValidation {
     private static boolean validateEmail(ServiceProvider serviceProvider) {
         String email = serviceProvider.getEmail();
         if (email == null || email.isEmpty()) {
-            throw new CustomException("Email Address cannot be null or empty!");
+            throw new Exception("Email Address cannot be null or empty!");
         }
         Pattern pattern = Pattern.compile(EMAIL_REGEX);
         if (!pattern.matcher(email).matches()) {
-            throw new CustomException("Please enter a valid email address!");
+            throw new Exception("Please enter a valid email address!");
         }
         return true;
     }

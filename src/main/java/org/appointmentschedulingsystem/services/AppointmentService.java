@@ -14,8 +14,8 @@ import org.appointmentschedulingsystem.mapper.ServiceProviderMapper;
 import org.appointmentschedulingsystem.mapper.UserMapper;
 import org.appointmentschedulingsystem.repositories.ServiceProviderRepository;
 import org.appointmentschedulingsystem.util.enums.BookStatus;
-import org.appointmentschedulingsystem.util.exception.CustomException;
-import org.appointmentschedulingsystem.util.validation.Validation;
+import org.appointmentschedulingsystem.util.exception.Exception;
+import org.appointmentschedulingsystem.util.validation.GlobalValidation;
 import org.springframework.stereotype.Component;
 import java.time.*;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 
-public class AppointmentService extends Validation {
+public class AppointmentService {
 
     private final UserRepository userRepository;
     private final ServiceProviderRepository serviceProviderRepository;
@@ -33,9 +33,9 @@ public class AppointmentService extends Validation {
     public AppointmentDto bookAppointment(String uid, String sid, AppointmentDto appointmentDTO) {
         Appointment appointment = AppointmentMapper.INSTANCE.appointmentToAppointment(appointmentDTO);
 
-        User user = userRepository.findById(uid).orElseThrow(() -> new CustomException("User Not Found"));
+        User user = userRepository.findById(uid).orElseThrow(() -> new Exception("User Not Found"));
         ServiceProvider serviceProvider = serviceProviderRepository.
-                findById(sid).orElseThrow(() -> new CustomException("Service Provider Not Found"));
+                findById(sid).orElseThrow(() -> new Exception("Service Provider Not Found"));
 
         if (user.getBookAppointments() == null) {
             user.setBookAppointments(new ArrayList<>());
@@ -54,9 +54,9 @@ public class AppointmentService extends Validation {
                 .anyMatch(a -> isSameAppointment(a, appointment, appointmentDayOfWeek));
 
         if (isBooked) {
-            throw new CustomException("Appointment Already Booked");
+            throw new Exception("Appointment Already Booked");
         }
-        Validation.validateAppointment(serviceProvider, appointment);
+        GlobalValidation.validateAppointment(serviceProvider, appointment);
         Appointment savedAppointment = appointmentRepository.save(appointment);
         user.getBookAppointments().add(savedAppointment);
         serviceProvider.getAppointments().add(savedAppointment);
@@ -76,11 +76,11 @@ public class AppointmentService extends Validation {
     public boolean removeAppointment(String id) {
 
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Appointment Not Found"));
+                .orElseThrow(() -> new Exception("Appointment Not Found"));
         User user = userRepository.findById(appointment.getUid())
-                .orElseThrow(() -> new CustomException("User Not Found"));
+                .orElseThrow(() -> new Exception("User Not Found"));
         ServiceProvider serviceProvider = serviceProviderRepository.findById(appointment.getSid())
-                .orElseThrow(() -> new CustomException("Service Provider Not Found"));
+                .orElseThrow(() -> new Exception("Service Provider Not Found"));
 
         UserDto userDTO = UserMapper.INSTANCE.UserToUserDTO(user);
         ServiceProviderDto serviceProviderDTO = ServiceProviderMapper.INSTANCE.mapToDTO(serviceProvider);
@@ -100,7 +100,7 @@ public class AppointmentService extends Validation {
             serviceProviderRepository.save(updatedServiceProvider);
             appointmentRepository.deleteById(id);
         } else {
-            throw new CustomException(
+            throw new Exception(
                     "You cannot delete this appointment because it is too close to the scheduled time."
             );
         }
@@ -111,18 +111,18 @@ public class AppointmentService extends Validation {
         Appointment updatedAppointment = AppointmentMapper.INSTANCE.appointmentToAppointment(appointmentDTO);
 
         Appointment existingAppointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Appointment Not Found"));
+                .orElseThrow(() -> new Exception("Appointment Not Found"));
         ServiceProvider serviceProvider = serviceProviderRepository.findById(existingAppointment.getSid())
-                .orElseThrow(() -> new CustomException("sid not found"));
+                .orElseThrow(() -> new Exception("sid not found"));
         User user = userRepository.findById(existingAppointment.getUid())
-                .orElseThrow(() -> new CustomException("User Not Found"));
+                .orElseThrow(() -> new Exception("User Not Found"));
 
         existingAppointment.setDate(updatedAppointment.getDate());
         existingAppointment.setDay(updatedAppointment.getDay());
         existingAppointment.setFromTime(updatedAppointment.getFromTime());
         existingAppointment.setToTime(updatedAppointment.getToTime());
 
-        Validation.validateAppointment(serviceProvider, updatedAppointment);
+        GlobalValidation.validateAppointment(serviceProvider, updatedAppointment);
         Appointment savedAppointment = appointmentRepository.save(existingAppointment);
         updateUserAppointment(user, savedAppointment);
         updateServiceProviderAppointment(serviceProvider, savedAppointment);
@@ -161,7 +161,7 @@ public class AppointmentService extends Validation {
     public List<AppointmentDto> getAppointments() {
         List<Appointment> allAppointment = appointmentRepository.findAll();
         if (allAppointment.isEmpty()) {
-            throw new CustomException("Appointment NOT Found !!");
+            throw new Exception("Appointment NOT Found !!");
         }
         return allAppointment.stream().map(AppointmentMapper.INSTANCE::appointmentToAppointmentDTO).toList();
     }
@@ -171,11 +171,11 @@ public class AppointmentService extends Validation {
         Appointment appointment = AppointmentMapper.INSTANCE.appointmentToAppointment(appointmentDTO);
 
         Appointment appointment1 = appointmentRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Appointment Not Found"));
+                .orElseThrow(() -> new Exception("Appointment Not Found"));
         ServiceProvider serviceProvider = serviceProviderRepository.findById(appointment1.getSid())
-                .orElseThrow(() -> new CustomException("Service Provider Not Found"));
+                .orElseThrow(() -> new Exception("Service Provider Not Found"));
         User user = userRepository.findById(appointment1.getUid())
-                .orElseThrow(() -> new CustomException("User Not Found"));
+                .orElseThrow(() -> new Exception("User Not Found"));
 
         appointment1.setStatus(appointment.getStatus());
         Appointment save = appointmentRepository.save(appointment1);
@@ -186,9 +186,9 @@ public class AppointmentService extends Validation {
 
     public List<AppointmentDto> getAppointments(String id) {
         ServiceProvider serviceProvider = serviceProviderRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Service Provider Not Found"));
+                .orElseThrow(() -> new Exception("Service Provider Not Found"));
         Appointment appointment1 = appointmentRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Appointment Not Found"));
+                .orElseThrow(() -> new Exception("Appointment Not Found"));
 
         List<Appointment> userBookedAppointments = serviceProvider.getAppointments();
         for (int i = 0; i < userBookedAppointments.size(); i++) {

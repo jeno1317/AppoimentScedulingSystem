@@ -52,14 +52,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(
-                                        "/User/userAdd",
+                                        "/user/user-add",
                                         "/auth/login",
-                                        "/ServiceProvider/addServiceProvider"
+                                        "/service-provider/add-service-provider",
+                                        "/user/get-near-service-provider/**"
                                 )
                                 .permitAll()
-                                .requestMatchers("/ServiceProvider/**")
+                                .requestMatchers("/service-provider/**")
                                 .hasAuthority(Role.SERVICE_PROVIDER.name())
-                                .requestMatchers("/User/**")
+                                .requestMatchers("/user/**")
                                 .hasAuthority(Role.USER.name())
                                 .anyRequest()
                                 .authenticated())

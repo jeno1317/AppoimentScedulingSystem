@@ -2,8 +2,8 @@ package org.appointmentschedulingsystem.util.validation;
 
 import io.micrometer.common.util.StringUtils;
 import org.appointmentschedulingsystem.entity.*;
-import org.appointmentschedulingsystem.util.exception.CustomException;
-import org.springframework.stereotype.Component;
+import org.appointmentschedulingsystem.util.exception.Exception;
+import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -13,30 +13,28 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-@Component
-
-public class Validation {
-
+@Service
+public class GlobalValidation {
     public static void validateAppointment(ServiceProvider serviceProvider, Appointment appointment) {
         if (!isAppointmentSlotAvailable(serviceProvider, appointment)) {
-            throw new CustomException("Regrettably, the appointment slot is not currently available.");
+            throw new Exception("Regrettably, the appointment slot is not currently available.");
         }
         if (!checkBreakTime(serviceProvider, appointment)) {
-            throw new CustomException("Apologies, this is my break time.");
+            throw new Exception("Apologies, this is my break time.");
         }
         if (!checkOffDay(serviceProvider, appointment)) {
-            throw new CustomException("Apologies, but I'm unavailable on my off day.");
+            throw new Exception("Apologies, but I'm unavailable on my off day.");
         }
         if (!isValidDate(appointment)) {
-            throw new CustomException("Please enter valid Date and  month");
+            throw new Exception("Please enter valid Date and  month");
         }
         if (!isValidDate1(appointment)) {
-            throw new CustomException("PLease enter check date and day !!");
+            throw new Exception("PLease enter check date and day !!");
         }
         validateAppointmentDetails(appointment);
         for (Appointment existingAppointment : serviceProvider.getAppointments()) {
             if (isTimeOverlap(existingAppointment, appointment)) {
-                throw new CustomException(
+                throw new Exception(
                         "Apologies, the appointment slot has already been booked." +
                                 " Assistance for a different time slot is available for your convenience.");
             }
@@ -52,10 +50,10 @@ public class Validation {
         Date oneDayPreviousDate = calendar.getTime();
 
         if (offDay.getFromDate().compareTo(oneDayPreviousDate) <= 0) {
-            throw new CustomException("From date must be after today's date");
+            throw new Exception("From date must be after today's date");
         }
         if (offDay.getToDate().before(offDay.getFromDate()) && !offDay.getToDate().equals(offDay.getFromDate())) {
-            throw new CustomException("To date must be after or equal to from date");
+            throw new Exception("To date must be after or equal to from date");
         }
     }
 
@@ -67,26 +65,26 @@ public class Validation {
         Date oneDayPreviousDate = calendar.getTime();
 
         if (appointment == null) {
-            throw new CustomException("appointment is null");
+            throw new Exception("appointment is null");
         }
         // Check if the user is provided
         if (appointment.getUid() == null) {
-            throw new CustomException("User ID is required");
+            throw new Exception("User ID is required");
         }
         // Check if the service provider is provided
         if (appointment.getSid() == null) {
-            throw new CustomException("Service provider ID is required");
+            throw new Exception("Service provider ID is required");
         }
         // Check if the appointment date is provided and is in the future
         if ((appointment.getDate() == null) || appointment.getDate().before(oneDayPreviousDate)) {
-            throw new CustomException("Appointment date must be in the future");
+            throw new Exception("Appointment date must be in the future");
         }
         // Check if the appointment time is provided
         if (StringUtils.isBlank(String.valueOf(appointment.getFromTime()))) {
-            throw new CustomException("Appointment time is required");
+            throw new Exception("Appointment time is required");
         }
         if (StringUtils.isBlank(String.valueOf(appointment.getToTime()))) {
-            throw new CustomException("Appointment time is required");
+            throw new Exception("Appointment time is required");
         }
 
     }
@@ -99,10 +97,10 @@ public class Validation {
         Date oneDayPreviousDate = calendar.getTime();
 
         if (newAppointment.getDate().before(oneDayPreviousDate)) {
-            throw new CustomException("Appointment date must be in the future");
+            throw new Exception("Appointment date must be in the future");
         }
         if (newAppointment.getFromTime().isAfter(newAppointment.getToTime())) {
-            throw new CustomException("From time must be before to time");
+            throw new Exception("From time must be before to time");
         }
 
         LocalTime newAppointmentStartTime = newAppointment.getFromTime();
@@ -223,7 +221,7 @@ public class Validation {
                 return day <= 29 && (day != 29 || isLeapYear);
             }
             return true;
-        } catch (CustomException e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -244,21 +242,27 @@ public class Validation {
                 return false;
             }
             return true;
-        } catch (CustomException e) {
+        } catch (Exception e) {
             System.out.println("Error processing the appointment date: " + e.getMessage());
             return false;
         }
     }
 
     public static void breakTimeCheck(BreakTime breakTime) {
-        if (breakTime.getToTime1() == breakTime.getToTime1()) {
-            throw new CustomException("Break ToTime And FromTime  Not Same !!");
+        if (breakTime.getFromTime1().equals(breakTime.getToTime1())) {
+            throw new Exception("Break ToTime and FromTime should not be the same!");
         }
         if (breakTime.getToTime1().isAfter(breakTime.getFromTime1())) {
-            throw new CustomException("Break FromTime Not After ToTime !!");
+            throw new Exception("Break ToTime should not be after FromTime!");
         }
         if (breakTime.getFromTime1().isBefore(breakTime.getToTime1())) {
-            throw new CustomException("Break ToTime Not Before FromTime !!");
+            throw new Exception("Break FromTime should not be before ToTime!");
+        }
+    }
+
+    public static void breakTimeCheckList(List<BreakTime> breakTimes){
+        for (BreakTime breakTime : breakTimes){
+            breakTimeCheck(breakTime);
         }
     }
 }

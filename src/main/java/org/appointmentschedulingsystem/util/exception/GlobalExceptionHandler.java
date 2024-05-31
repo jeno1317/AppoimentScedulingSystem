@@ -16,17 +16,6 @@ public class GlobalExceptionHandler {
 
     private final static Logger logger= LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(CustomException ce, WebRequest request) {
-        logger.error("CustomException", ce.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(LocalDateTime.now());
-        errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        errorResponse.setMessage(ce.getMessage());
-        errorResponse.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, WebRequest request) {
         logger.error("An error occurred: {}", ex.getMessage());

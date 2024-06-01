@@ -9,7 +9,6 @@ import org.appointmentschedulingsystem.dtos.UserDto;
 import org.appointmentschedulingsystem.services.AppointmentService;
 import org.appointmentschedulingsystem.services.UserService;
 import org.appointmentschedulingsystem.util.enums.ProfessionType;
-import org.appointmentschedulingsystem.util.exception.Exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -43,17 +42,13 @@ public class UserController {
 
     @PatchMapping("/user-update/{email}")
     public ResponseEntity<UserDto> updateUser(@PathVariable("email") String email, @RequestBody UserDto userDto) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body( userService.userUpdate(email, userDto));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.userUpdate(email, userDto));
     }
 
     @DeleteMapping("/user-delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") String id) {
-        boolean deleteUser = userService.deleteUser(id);
-        if (deleteUser) {
-            return ResponseEntity.ok("deleted user successfully");
-        } else {
-            throw new Exception("User not deleted !!");
-        }
+        userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/add-location/{id}")
@@ -64,7 +59,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.addLocation(id, locationDTO));
     }
 
-        @PatchMapping("/update-location/{id}")
+    @PatchMapping("/update-location/{id}")
     public ResponseEntity<LocationDto> updateLocation(
             @PathVariable("id") String id,
             @RequestBody LocationDto locationDTO
@@ -74,17 +69,11 @@ public class UserController {
 
     @DeleteMapping("/delete-location/{id}/{type}")
     public ResponseEntity<String> deleteLocation(@PathVariable("id") String id, @PathVariable("type") String type) {
-        boolean deleteLocation = userService.deleteLocation(id, type);
-        if (deleteLocation) {
-            return ResponseEntity.ok("Deleted location");
-
-        } else {
-            throw new Exception("User location not deleted !!");
-        }
-
+        userService.deleteLocation(id, type);
+        return ResponseEntity.ok("Deleted location");
     }
 
-        @PostMapping("/book-appointment/{uid}/{sid}")
+    @PostMapping("/book-appointment/{uid}/{sid}")
     public ResponseEntity<AppointmentDto> bookAppointment(
             @PathVariable("uid") String uid,
             @PathVariable("sid") String sid,
@@ -95,25 +84,17 @@ public class UserController {
 
     @DeleteMapping("/delete-appointment/{id}")
     public ResponseEntity<String> deleteAppointment(@PathVariable("id") String id) {
-
-        boolean removeAppointment = appointmentService.removeAppointment(id);
-        if (removeAppointment) {
-            return ResponseEntity.ok("Appointment deleted successfully");
-
-        } else {
-            return ResponseEntity.badRequest().body("Appointment Not Deleted");
-        }
+        appointmentService.removeAppointment(id);
+        return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/update-appointment/{id}/{uid}/{sid}")
+    @PatchMapping("/update-appointment/{id}")
     public ResponseEntity<AppointmentDto> updateAppointment(
             @PathVariable("id") String id,
-            @PathVariable("uid") String uid,
-            @PathVariable("sid") String sid,
             @RequestBody AppointmentDto appointmentDTO
     ) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(appointmentService.updateAppointment(id, uid, sid, appointmentDTO));
+                .body(appointmentService.updateAppointment(id, appointmentDTO));
     }
 
     @GetMapping("/all-appointment")

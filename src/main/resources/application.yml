@@ -6,6 +6,10 @@ server:
         keyAlias: your_alias
         keyStoreType: PKCS12
 spring:
+    security:
+        jwt:
+            secret: asdfghjklzxcvbnmqwertyuiopzxcvbnmasdfghjklqwertyuiopMNBVCXZLKJHGFDSAPOIUYTREWQzxcvbnmLKJHGFDIUY
+            tokenValidity: 3600
     application:
         name: AppointmentSchedulingSystem
     data:

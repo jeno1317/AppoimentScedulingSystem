@@ -4,12 +4,6 @@ import lombok.AllArgsConstructor;
 import org.appointmentschedulingsystem.dtos.JwtResponse;
 import org.appointmentschedulingsystem.dtos.JwtRequest;
 import org.appointmentschedulingsystem.security.authentication.JwtHelper;
-import org.appointmentschedulingsystem.dtos.UserDto;
-import org.appointmentschedulingsystem.repositories.UserRepository;
-import org.appointmentschedulingsystem.services.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,9 +21,6 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final AuthenticationManager manager;
     private final JwtHelper helper;
-    private final UserService userService;
-
-    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
@@ -51,12 +42,6 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             throw new BadCredentialsException(" Invalid Username or Password  !!");
         }
-    }
-
-    @PostMapping("/userAdd")
-    public ResponseEntity<UserDto> userAdd(@RequestBody UserDto userDTO) {
-        UserDto userDto1 = userService.addUser(userDTO);
-        return ResponseEntity.ok(userDto1);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

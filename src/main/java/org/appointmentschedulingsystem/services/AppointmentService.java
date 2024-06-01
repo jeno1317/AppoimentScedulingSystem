@@ -73,7 +73,7 @@ public class AppointmentService {
     }
 
 
-    public boolean removeAppointment(String id) {
+    public void removeAppointment(String id) {
 
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new Exception("Appointment Not Found"));
@@ -100,14 +100,11 @@ public class AppointmentService {
             serviceProviderRepository.save(updatedServiceProvider);
             appointmentRepository.deleteById(id);
         } else {
-            throw new Exception(
-                    "You cannot delete this appointment because it is too close to the scheduled time."
-            );
+            throw new Exception("You cannot delete this appointment because it is too close to the scheduled time.");
         }
-        return true;
     }
 
-    public AppointmentDto updateAppointment(String id, String uid, String sid, AppointmentDto appointmentDTO) {
+    public AppointmentDto updateAppointment(String id, AppointmentDto appointmentDTO) {
         Appointment updatedAppointment = AppointmentMapper.INSTANCE.appointmentToAppointment(appointmentDTO);
 
         Appointment existingAppointment = appointmentRepository.findById(id)
@@ -166,8 +163,7 @@ public class AppointmentService {
         return allAppointment.stream().map(AppointmentMapper.INSTANCE::appointmentToAppointmentDTO).toList();
     }
 
-    public AppointmentDto appointmentStatus(String id, String uid, String sid, AppointmentDto appointmentDTO) {
-
+    public AppointmentDto appointmentStatus(String id, AppointmentDto appointmentDTO) {
         Appointment appointment = AppointmentMapper.INSTANCE.appointmentToAppointment(appointmentDTO);
 
         Appointment appointment1 = appointmentRepository.findById(id)
@@ -187,17 +183,8 @@ public class AppointmentService {
     public List<AppointmentDto> getAppointments(String id) {
         ServiceProvider serviceProvider = serviceProviderRepository.findById(id)
                 .orElseThrow(() -> new Exception("Service Provider Not Found"));
-        Appointment appointment1 = appointmentRepository.findById(id)
-                .orElseThrow(() -> new Exception("Appointment Not Found"));
-
         List<Appointment> userBookedAppointments = serviceProvider.getAppointments();
-        for (int i = 0; i < userBookedAppointments.size(); i++) {
-            Appointment userAppointment = userBookedAppointments.get(i);
-            if (userAppointment.getId().equals(appointment1.getId())) {
-                userBookedAppointments.set(i, appointment1);
-            }
-            break;
-        }
         return AppointmentMapper.INSTANCE.appointmentsToAppointmentDTO(userBookedAppointments);
     }
+
 }

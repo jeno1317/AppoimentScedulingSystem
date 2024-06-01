@@ -2,9 +2,7 @@ package org.appointmentschedulingsystem.repositories;
 
 import org.appointmentschedulingsystem.entity.ServiceProvider;
 import org.appointmentschedulingsystem.util.enums.ProfessionType;
-import org.springframework.data.geo.Distance;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 
@@ -15,8 +13,6 @@ public interface ServiceProviderRepository extends MongoRepository<ServiceProvid
     }
 
     List<ServiceProvider> findByProfessionName(ProfessionType professionName);
-
-    public List<ServiceProvider> findByLocationNear(Point point, Distance distance);
 
     ServiceProvider findByEmail(String email);
 

@@ -72,12 +72,8 @@ public class ServiceProviderController {
 
     @DeleteMapping("/delete-day/{id}/{day}")
     public ResponseEntity<String> deleteDayAndTime(@PathVariable("id") String id, @PathVariable("day") String day) {
-        try {
             ServiceProviderService.deleteDayAndTime(id, day);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Delete day and time successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Delete day and time failed");
-        }
+            return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/day-to-time-from-time/{id}")
@@ -123,12 +119,8 @@ public class ServiceProviderController {
 
     @DeleteMapping("/delete-single-off-day/{id}/{type}")
     public ResponseEntity<String> deleteOffDay(@PathVariable("id") String id, @PathVariable("type") HolidayType type) {
-        try {
             ServiceProviderService.deleteOffDay(id, type);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Delete the off day");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Not delete the off day");
-        }
+            return ResponseEntity.ok().build();
     }
 
     @GetMapping("/get-off-day/{id}")
@@ -156,13 +148,8 @@ public class ServiceProviderController {
 
     @DeleteMapping("/delete-location/{id}/{type}")
     public ResponseEntity<String> deleteLocation(@PathVariable("id") String id, @PathVariable("type") String type) {
-        try {
             ServiceProviderService.deleteLocation(id, type);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("service Provider location deleted");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("service Provider location not deleted");
-        }
     }
 
     @PostMapping("/add-break-time/{id}/{day}")
@@ -191,26 +178,18 @@ public class ServiceProviderController {
         ServiceProviderService.deleteBreakTimes(id, title, day);
     }
 
-        @PatchMapping("/update-appointment-status/{id}/{uid}/{sid}")
+        @PatchMapping("/update-appointment-status/{id}")
     public ResponseEntity<AppointmentDto> updateAppointmentStatus(
             @PathVariable("id") String id,
-            @PathVariable("uid") String uid,
-            @PathVariable("sid") String sid,
             @RequestBody AppointmentDto appointment
     ) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(AppointmentService.appointmentStatus(id, uid, sid, appointment));
+                .body(AppointmentService.appointmentStatus(id, appointment));
     }
 
     @GetMapping("/all-appointment-detail-by-id/{id}")
     public ResponseEntity<List<AppointmentDto>> getAllAppointment(@PathVariable("id") String id) {
-        try {
-            List<AppointmentDto> appointments = AppointmentService.getAppointments(id);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(appointments);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(AppointmentService.getAppointments(id));
     }
 
 }

@@ -85,7 +85,7 @@ public class UserService extends UserValidation {
         return UserMapper.INSTANCE.UserToUserDTO(user);
     }
 
-    public boolean deleteUser(String id) {
+    public void deleteUser(String id) {
         User user = userRepository.findById(id).orElseThrow(() -> new Exception("User Not Found"));
         List<Appointment> appointments = user.getBookAppointments();
         for (Appointment appointment : appointments) {
@@ -96,7 +96,6 @@ public class UserService extends UserValidation {
             serviceProviderRepository.save(serviceProvider);
         }
         userRepository.deleteById(id);
-        return true;
     }
 
     public LocationDto addLocation(String id, LocationDto locationDTO) {
@@ -118,14 +117,13 @@ public class UserService extends UserValidation {
         return LocationMapper.INSTANCE.locationToLocationDTO(location);
     }
 
-    public boolean deleteLocation(String id, String type) {
+    public void deleteLocation(String id, String type) {
         User user = userRepository.findById(id).orElseThrow(() -> new Exception("User does not exist"));
         Location location = user.getLocation();
         if (location != null && location.getType().equals(type)) {
             location.setCoordinates(Arrays.asList(0.0, 0.0));
         }
         userRepository.save(user);
-        return true;
     }
 
     public List<ServiceProviderDto> findNearbyServiceProviders(

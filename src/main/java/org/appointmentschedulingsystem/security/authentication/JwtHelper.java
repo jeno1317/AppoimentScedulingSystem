@@ -3,6 +3,7 @@ package org.appointmentschedulingsystem.security.authentication;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.util.Date;
@@ -13,9 +14,11 @@ import java.util.function.Function;
 @Component
 public class JwtHelper {
 
-    //ToDo: Move this to application.properties
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
-    private final String secret = "afafasfafafasfasfasfafacasdasfasxASFACASDFACASDFASFASFDAFASFASDAADSCSDFADCVSGCFVADXCcadwavfsfarvf";
+    @Value("${spring.security.jwt.secret}")
+    private String secret;
+
+    @Value("${spring.security.jwt.tokenValidity}")
+    private long jwtTokenValidity;
 
     //retrieve username from jwt token
     public String getUsernameFromToken(String token) {
@@ -52,7 +55,7 @@ public class JwtHelper {
     private String doGenerateToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
     //validate token

@@ -1,9 +1,8 @@
 debug: true
 server:
     ssl:
-        key-store: classpath:keystore.p12
-        key-store-password: jenil@1317
-        keyAlias: your_alias
+        key-store: classpath:AppointmentSchedulingSystem.p12
+        key-store-password: xyz@123
         keyStoreType: PKCS12
 spring:
     security:

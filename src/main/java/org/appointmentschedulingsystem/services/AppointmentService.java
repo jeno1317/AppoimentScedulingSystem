@@ -72,7 +72,6 @@ public class AppointmentService {
                 a.getToTime().equals(appointment.getToTime());
     }
 
-
     public void removeAppointment(String id) {
 
         Appointment appointment = appointmentRepository.findById(id)

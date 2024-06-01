@@ -28,7 +28,6 @@ public class ServiceProviderService extends ServiceProviderValidation {
     private final ServiceProviderRepository ServiceProviderRepository;
     private final PasswordEncoder passwordEncoder;
 
-
     public List<ServiceProviderDto> getProfessional() {
         List<ServiceProvider> all = ServiceProviderRepository.findAll();
         if (all.isEmpty()) {
@@ -81,7 +80,6 @@ public class ServiceProviderService extends ServiceProviderValidation {
         ServiceProviderRepository.save(serviceProviderDemo);
         return ServiceProviderMapper.INSTANCE.mapToDTO(serviceProviderDemo);
     }
-
 
     public AvailableWeekDayDto addSingleAvailableWeekDay(String id, AvailableWeekDayDto availableWeekDayDTO) {
         AvailableWeekDay availableWeekDay = AvailableWeekDayMapper.INSTANCE.DTOToMap(availableWeekDayDTO);

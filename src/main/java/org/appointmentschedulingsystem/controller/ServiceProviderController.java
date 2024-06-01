@@ -158,7 +158,8 @@ public class ServiceProviderController {
             @PathVariable("day") String day,
             @RequestBody List<BreakTimeDto> breakTimeDTOS
     ) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ServiceProviderService.addBreakTime(id, day, breakTimeDTOS));
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(ServiceProviderService.addBreakTime(id, day, breakTimeDTOS));
     }
     @PatchMapping("/update-break-time/{id}/{day}")
     public ResponseEntity<List<BreakTimeDto>> updateBreakTime(
@@ -166,7 +167,8 @@ public class ServiceProviderController {
             @PathVariable("day") String day,
             @RequestBody List<BreakTimeDto> breakTimeDTOS
     ) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ServiceProviderService.updateBreakTime(id, day, breakTimeDTOS));
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(ServiceProviderService.updateBreakTime(id, day, breakTimeDTOS));
     }
 
     @DeleteMapping("/delete-break-time/{id}/{title}/{day}")

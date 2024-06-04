@@ -15,14 +15,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
+
+import static org.appointmentschedulingsystem.util.validation.ServiceProviderValidation.checkBreakTimes;
+import static org.appointmentschedulingsystem.util.validation.ServiceProviderValidation.checkOffDay;
 
 @Configuration
 @Component
 @Service
 @AllArgsConstructor
 
-public class ServiceProviderService extends ServiceProviderValidation {
+public class ServiceProviderService {
 
     private final GlobalValidation validation;
     private final ServiceProviderRepository ServiceProviderRepository;
@@ -44,8 +48,8 @@ public class ServiceProviderService extends ServiceProviderValidation {
         ServiceProvider serviceProvider = ServiceProviderMapper.INSTANCE.mapToEntity(serviceProviderDTO);
         serviceProvider.setRole(Role.SERVICE_PROVIDER);
         serviceProvider.setPassword(passwordEncoder.encode(serviceProvider.getPassword()));
-        serviceProviderValidation(serviceProvider);
-        checkAvailableWeekDay(serviceProvider.getAvailableWeekDay());
+        ServiceProviderValidation.serviceProviderValidation(serviceProvider);
+        ServiceProviderValidation.checkAvailableWeekDay(serviceProvider.getAvailableWeekDay());
         checkBreakTimes(serviceProvider.getAvailableWeekDay());
         checkOffDay(serviceProvider.getOffDay());
         ServiceProvider save = ServiceProviderRepository.save(serviceProvider);
@@ -73,8 +77,8 @@ public class ServiceProviderService extends ServiceProviderValidation {
         ServiceProvider serviceProvider = ServiceProviderMapper.INSTANCE.mapToEntity(serviceProviderDTO);
         ServiceProvider serviceProvider1 = ServiceProviderRepository.findByEmail(email);
         ServiceProvider serviceProviderDemo = ServiceProviderMapper.INSTANCE.update(serviceProviderDTO, serviceProvider1);
-        serviceProviderValidation(serviceProvider);
-        checkAvailableWeekDay(serviceProvider.getAvailableWeekDay());
+        ServiceProviderValidation.serviceProviderValidation(serviceProvider);
+        ServiceProviderValidation.checkAvailableWeekDay(serviceProvider.getAvailableWeekDay());
         checkBreakTimes(serviceProvider.getAvailableWeekDay());
         checkOffDay(serviceProvider.getOffDay());
         ServiceProviderRepository.save(serviceProviderDemo);
@@ -90,9 +94,10 @@ public class ServiceProviderService extends ServiceProviderValidation {
         boolean matchFound = existingWeekDays.stream()
                 .anyMatch(day -> day.getDay().equalsIgnoreCase(availableWeekDay.getDay()));
         if (matchFound) {
-            existingWeekDays.stream()
+            existingWeekDays
+                    .stream()
                     .filter(day -> day.getDay().equalsIgnoreCase(availableWeekDay.getDay()))
-                    .findFirst().ifPresent(day -> {
+                       .findFirst().ifPresent(day -> {
                         day.setFromTime(availableWeekDay.getFromTime());
                         day.setToTime(availableWeekDay.getToTime());
                         day.setBreakTime(availableWeekDay.getBreakTime());
@@ -314,7 +319,8 @@ public class ServiceProviderService extends ServiceProviderValidation {
         for (AvailableWeekDay availableWeekDay : serviceProvider.getAvailableWeekDay()) {
             if (availableWeekDay.getDay().equalsIgnoreCase(day)) {
                 List<BreakTime> breakTimes = availableWeekDay.getBreakTime();
-                Optional<BreakTime> breakTimeOptional = breakTimes.stream()
+                Optional<BreakTime> breakTimeOptional = breakTimes
+                        .stream()
                         .filter(breakTime -> breakTime.getTitle().equalsIgnoreCase(title))
                         .findFirst();
                 breakTimeOptional.ifPresent(breakTimes::remove);
@@ -329,7 +335,8 @@ public class ServiceProviderService extends ServiceProviderValidation {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
                 .orElseThrow(() -> new Exception("Service Provider NOT Found"));
         List<AvailableWeekDay> availableWeekDays = serviceProvider.getAvailableWeekDay();
-        AvailableWeekDay availableWeekDay = availableWeekDays.stream()
+        AvailableWeekDay availableWeekDay = availableWeekDays
+                .stream()
                 .filter(availableWeekDay1 -> availableWeekDay1.getDay().equalsIgnoreCase(day))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No AvailableWeekDay found for the provided day."));
@@ -348,4 +355,3 @@ public class ServiceProviderService extends ServiceProviderValidation {
         ServiceProviderRepository.save(serviceProvider);
     }
 }
-

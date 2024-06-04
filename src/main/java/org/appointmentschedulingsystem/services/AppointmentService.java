@@ -17,13 +17,13 @@ import org.appointmentschedulingsystem.util.enums.BookStatus;
 import org.appointmentschedulingsystem.util.exception.Exception;
 import org.appointmentschedulingsystem.util.validation.GlobalValidation;
 import org.springframework.stereotype.Component;
+
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @AllArgsConstructor
-
 public class AppointmentService {
 
     private final UserRepository userRepository;
@@ -137,7 +137,7 @@ public class AppointmentService {
             }
         }
         if (!appointmentUpdated) {
-            throw new IllegalArgumentException("Appointment not found for the user");
+            throw new Exception("Appointment not found for the user");
         }
         userRepository.save(user);
     }

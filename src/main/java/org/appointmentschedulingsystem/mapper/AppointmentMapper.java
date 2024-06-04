@@ -7,7 +7,6 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 @Mapper
-
 public interface AppointmentMapper {
 
     AppointmentMapper INSTANCE= Mappers.getMapper(AppointmentMapper.class);

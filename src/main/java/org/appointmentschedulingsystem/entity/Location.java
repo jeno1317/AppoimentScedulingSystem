@@ -6,7 +6,6 @@ import java.util.List;
 
 @Getter
 @Setter
-
 public class Location {
 
     private String type;

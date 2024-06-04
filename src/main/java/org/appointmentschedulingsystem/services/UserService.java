@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
 @Component
 @Service
 @AllArgsConstructor
-
-public class UserService extends UserValidation {
+public class UserService {
 
     private final UserRepository userRepository;
     private final ServiceProviderRepository serviceProviderRepository;
@@ -67,7 +66,7 @@ public class UserService extends UserValidation {
             user.setImage(image.getBytes());
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userValidation(user);
+        UserValidation.userValidation(user);
         User savedUser = userRepository.save(user);
         List<Appointment> appointments = savedUser.getBookAppointments();
         for (Appointment appointment : appointments) {
@@ -86,7 +85,7 @@ public class UserService extends UserValidation {
         }
         User update = UserMapper.INSTANCE.update(userDto, byEmail);
         user.setRole(Role.USER);
-        userValidation(user);
+        UserValidation.userValidation(user);
         userRepository.save(update);
         return UserMapper.INSTANCE.UserToUserDTO(user);
     }

@@ -11,7 +11,6 @@ import java.time.LocalTime;
 
 @ReadingConverter
 @WritingConverter
-
 public class LocalDateTimeConverter implements PropertyValueConverter
         <LocalTime, String, ValueConversionContext<? extends PersistentProperty<?>>> {
     @Override

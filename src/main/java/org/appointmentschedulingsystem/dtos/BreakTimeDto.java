@@ -8,7 +8,6 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
-
 public class BreakTimeDto {
 
     private String title;

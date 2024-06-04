@@ -14,7 +14,6 @@ import java.util.Optional;
 @RequestMapping("/service-provider")
 @RestController
 @AllArgsConstructor
-
 public class ServiceProviderController {
 
     private final ServiceProviderService ServiceProviderService;

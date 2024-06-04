@@ -21,10 +21,8 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@Validated
 @RequestMapping("/user")
 @AllArgsConstructor
-
 public class UserController {
 
     private final UserService userService;
@@ -86,7 +84,7 @@ public class UserController {
     public ResponseEntity<AppointmentDto> bookAppointment(
             @PathVariable("uid") String uid,
             @PathVariable("sid") String sid,
-            @Valid @RequestBody AppointmentDto appointmentDTO
+            @RequestBody AppointmentDto appointmentDTO
     ) {
         return ResponseEntity.ok(appointmentService.bookAppointment(uid, sid, appointmentDTO));
     }

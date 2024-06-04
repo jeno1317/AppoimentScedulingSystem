@@ -12,7 +12,6 @@ import java.util.List;
 @Document(collection = "appointmentschedulingsystem")
 @Getter
 @Setter
-
 public class ServiceProvider {
 
     @Id

@@ -4,12 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.appointmentschedulingsystem.config.LocalDateTimeConverter;
 import org.springframework.data.convert.ValueConverter;
-
 import java.time.LocalTime;
 
 @Getter
 @Setter
-
 public class BreakTime {
     private String title;
 

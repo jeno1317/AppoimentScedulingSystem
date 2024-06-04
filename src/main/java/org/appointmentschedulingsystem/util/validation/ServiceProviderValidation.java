@@ -17,7 +17,7 @@ public class ServiceProviderValidation {
     private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&amp;+=])(?=\\S+$).{8,}$";
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
-    protected static void serviceProviderValidation(ServiceProvider serviceProvider) {
+    public static void serviceProviderValidation(ServiceProvider serviceProvider) {
         if (serviceProvider == null) {
             throw new Exception("Service provider details cannot be null!");
         }
@@ -40,9 +40,10 @@ public class ServiceProviderValidation {
                     " including at least one uppercase letter, " +
                     "one lowercase letter, one digit, and one special character");
         }
+
     }
 
-    public void checkAvailableWeekDay(List<AvailableWeekDay> availableWeekDay) {
+    public static void checkAvailableWeekDay(List<AvailableWeekDay> availableWeekDay) {
         for (AvailableWeekDay availableWeekDay1 : availableWeekDay) {
             LocalTime fromTime = availableWeekDay1.getFromTime();
             LocalTime toTime = availableWeekDay1.getToTime();
@@ -57,7 +58,7 @@ public class ServiceProviderValidation {
         }
     }
 
-    public void checkOffDay(List<OffDay> offDays) {
+    public static void checkOffDay(List<OffDay> offDays) {
         Calendar calendar = Calendar.getInstance();
         Date currentDate = new Date();
         calendar.setTime(currentDate);
@@ -75,7 +76,7 @@ public class ServiceProviderValidation {
 
     }
 
-    protected void checkBreakTimes(List<AvailableWeekDay> availableWeekDays) {
+    public static void checkBreakTimes(List<AvailableWeekDay> availableWeekDays) {
         for (AvailableWeekDay availableWeekDay : availableWeekDays) {
             List<BreakTime> breakTimes = availableWeekDay.getBreakTime();
             if (breakTimes != null) {
@@ -86,7 +87,7 @@ public class ServiceProviderValidation {
         }
     }
 
-    private void validateBreakTime(BreakTime breakTime) {
+    private static void validateBreakTime(BreakTime breakTime) {
         if (breakTime.getToTime1().equals(breakTime.getFromTime1())) {
             throw new Exception("Break ToTime and FromTime cannot be the same!");
         }

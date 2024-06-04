@@ -9,7 +9,6 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-
 public class OffDayDto {
 
     private Date fromDate;

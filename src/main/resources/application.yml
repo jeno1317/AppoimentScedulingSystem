@@ -5,6 +5,11 @@ server:
         key-store-password: xyz@123
         keyStoreType: PKCS12
 spring:
+    servlet:
+        multipart:
+            enabled: true
+            max-file-size: 10MB
+            max-request-size: 10MB
     security:
         jwt:
             secret: asdfghjklzxcvbnmqwertyuiopzxcvbnmasdfghjklqwertyuiopMNBVCXZLKJHGFDSAPOIUYTREWQzxcvbnmLKJHGFDIUY

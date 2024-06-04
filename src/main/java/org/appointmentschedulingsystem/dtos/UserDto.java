@@ -21,6 +21,7 @@ public class UserDto {
     private String email;
     private String password;
     private String address;
+    private byte[] image;
     private Role role;
     private LocationDto location;
     private List<AppointmentDto> bookAppointments;

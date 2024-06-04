@@ -8,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
-@Document(collection = "AppointmentSchedulingSystem")
+@Document(collection = "appointmentschedulingsystem")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,6 +23,7 @@ public class User  {
     private String email;
     private String password;
     private String address;
+    private byte[] image;
     private Role role;
     private Location location;
     private List<Appointment> bookAppointments;

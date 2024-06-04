@@ -1,5 +1,7 @@
 package org.appointmentschedulingsystem.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.appointmentschedulingsystem.dtos.AppointmentDto;
@@ -13,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -26,8 +31,12 @@ public class UserController {
     private final AppointmentService appointmentService;
 
     @PostMapping("/user-add")
-    public ResponseEntity<UserDto> userAdd(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.addUser(userDto));
+    public ResponseEntity<UserDto> registerUser(
+            @RequestPart("user") String userDtoString,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+            ObjectMapper objectMapper = new ObjectMapper();
+            UserDto userDto = objectMapper.readValue(userDtoString, UserDto.class);
+            return ResponseEntity.ok(userService.addUser(userDto, image));
     }
 
     @GetMapping("/get-user")

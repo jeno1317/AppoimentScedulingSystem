@@ -20,7 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.appointmentschedulingsystem.repositories.ServiceProviderRepository;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,22 +56,26 @@ public class UserService extends UserValidation {
         return all.stream().map(UserMapper.INSTANCE::UserToUserDTO).toList();
     }
 
-    public UserDto addUser(UserDto userDto) {
+    public UserDto addUser(UserDto userDto, MultipartFile image) throws IOException {
         User user = UserMapper.INSTANCE.MapUserToUser(userDto);
         User checkExistingUser = userRepository.findByEmail(user.getEmail());
         if (checkExistingUser != null) {
             throw new Exception("User already exists");
         }
         user.setRole(Role.USER);
+        if (image != null && !image.isEmpty()) {
+            user.setImage(image.getBytes());
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userValidation(user);
-        User save = userRepository.save(user);
-        List<Appointment> appointments = save.getBookAppointments();
+        User savedUser = userRepository.save(user);
+        List<Appointment> appointments = savedUser.getBookAppointments();
         for (Appointment appointment : appointments) {
-            appointment.setUid(save.getId());
-            userRepository.save(save);
+            appointment.setUid(savedUser.getId());
         }
-        return UserMapper.INSTANCE.UserToUserDTO(user);
+        savedUser.setBookAppointments(appointments);
+        userRepository.save(savedUser);
+        return UserMapper.INSTANCE.UserToUserDTO(savedUser);
     }
 
     public UserDto userUpdate(String email, UserDto userDto) {
@@ -145,8 +151,8 @@ public class UserService extends UserValidation {
                 .collect(Collectors.toList());
     }
 
-    public  List<ServiceProviderDto> searchByProfession(ProfessionType professionName) {
-        List<ServiceProvider> serviceProviders =serviceProviderRepository.findByProfessionName(professionName);
+    public List<ServiceProviderDto> searchByProfession(ProfessionType professionName) {
+        List<ServiceProvider> serviceProviders = serviceProviderRepository.findByProfessionName(professionName);
         if (serviceProviders.isEmpty()) {
             throw new Exception("Record not found for service Provider !!");
         }

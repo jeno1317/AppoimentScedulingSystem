@@ -27,5 +27,26 @@ public class GlobalExceptionHandler {
         errorResponse.setPath(request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex,WebRequest request){
+        logger.error("UserNotFound : {}",ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        errorResponse.setError("User Not Found !!");
+        errorResponse.setMessage(ex.getMessage());
+        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ServiceProviderNotFound.class)
+    public ResponseEntity<ErrorResponse> handleServiceProviderNotFoundException(ServiceProviderNotFound ex,WebRequest request){
+        logger.error("Service Provider Not Found : {}",ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        errorResponse.setError("User Not Found !!");
+        errorResponse.setMessage(ex.getMessage());
+        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+    }
 
 }

@@ -15,6 +15,8 @@ import org.appointmentschedulingsystem.mapper.UserMapper;
 import org.appointmentschedulingsystem.repositories.ServiceProviderRepository;
 import org.appointmentschedulingsystem.util.enums.BookStatus;
 import org.appointmentschedulingsystem.util.exception.Exception;
+import org.appointmentschedulingsystem.util.exception.ServiceProviderNotFound;
+import org.appointmentschedulingsystem.util.exception.UserNotFoundException;
 import org.appointmentschedulingsystem.util.validation.GlobalValidation;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +35,9 @@ public class AppointmentService {
     public AppointmentDto bookAppointment(String uid, String sid, AppointmentDto appointmentDTO) {
         Appointment appointment = AppointmentMapper.INSTANCE.appointmentToAppointment(appointmentDTO);
 
-        User user = userRepository.findById(uid).orElseThrow(() -> new Exception("User Not Found"));
+        User user = userRepository.findById(uid).orElseThrow(() -> new UserNotFoundException("User Not Found"));
         ServiceProvider serviceProvider = serviceProviderRepository.
-                findById(sid).orElseThrow(() -> new Exception("Service Provider Not Found"));
+                findById(sid).orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found"));
 
         if (user.getBookAppointments() == null) {
             user.setBookAppointments(new ArrayList<>());
@@ -77,9 +79,9 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new Exception("Appointment Not Found"));
         User user = userRepository.findById(appointment.getUid())
-                .orElseThrow(() -> new Exception("User Not Found"));
+                .orElseThrow(() -> new UserNotFoundException("User Not Found"));
         ServiceProvider serviceProvider = serviceProviderRepository.findById(appointment.getSid())
-                .orElseThrow(() -> new Exception("Service Provider Not Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found"));
 
         UserDto userDTO = UserMapper.INSTANCE.UserToUserDTO(user);
         ServiceProviderDto serviceProviderDTO = ServiceProviderMapper.INSTANCE.mapToDTO(serviceProvider);
@@ -109,9 +111,9 @@ public class AppointmentService {
         Appointment existingAppointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new Exception("Appointment Not Found"));
         ServiceProvider serviceProvider = serviceProviderRepository.findById(existingAppointment.getSid())
-                .orElseThrow(() -> new Exception("sid not found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("ServiceProvider Not Found !!"));
         User user = userRepository.findById(existingAppointment.getUid())
-                .orElseThrow(() -> new Exception("User Not Found"));
+                .orElseThrow(() -> new UserNotFoundException("User Not Found !!"));
 
         existingAppointment.setDate(updatedAppointment.getDate());
         existingAppointment.setDay(updatedAppointment.getDay());
@@ -168,9 +170,9 @@ public class AppointmentService {
         Appointment appointment1 = appointmentRepository.findById(id)
                 .orElseThrow(() -> new Exception("Appointment Not Found"));
         ServiceProvider serviceProvider = serviceProviderRepository.findById(appointment1.getSid())
-                .orElseThrow(() -> new Exception("Service Provider Not Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         User user = userRepository.findById(appointment1.getUid())
-                .orElseThrow(() -> new Exception("User Not Found"));
+                .orElseThrow(() -> new UserNotFoundException("User Not Found !!"));
 
         appointment1.setStatus(appointment.getStatus());
         Appointment save = appointmentRepository.save(appointment1);
@@ -181,7 +183,7 @@ public class AppointmentService {
 
     public List<AppointmentDto> getAppointments(String id) {
         ServiceProvider serviceProvider = serviceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service Provider Not Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<Appointment> userBookedAppointments = serviceProvider.getAppointments();
         return AppointmentMapper.INSTANCE.appointmentsToAppointmentDTO(userBookedAppointments);
     }

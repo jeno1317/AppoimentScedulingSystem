@@ -1,5 +1,6 @@
 package org.appointmentschedulingsystem.mapper;
 
+import org.appointmentschedulingsystem.config.MapStructConfig;
 import org.appointmentschedulingsystem.dtos.ServiceProviderDto;
 import org.appointmentschedulingsystem.entity.ServiceProvider;
 import org.mapstruct.Mapper;
@@ -7,8 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
-
+@Mapper(config =    MapStructConfig.class)
 public interface ServiceProviderMapper {
 
     ServiceProviderMapper INSTANCE = Mappers.getMapper(ServiceProviderMapper.class);

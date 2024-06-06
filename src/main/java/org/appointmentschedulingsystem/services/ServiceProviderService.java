@@ -9,6 +9,7 @@ import org.appointmentschedulingsystem.repositories.ServiceProviderRepository;
 import org.appointmentschedulingsystem.util.enums.HolidayType;
 import org.appointmentschedulingsystem.util.enums.Role;
 import org.appointmentschedulingsystem.util.exception.Exception;
+import org.appointmentschedulingsystem.util.exception.ServiceProviderNotFound;
 import org.appointmentschedulingsystem.util.validation.ServiceProviderValidation;
 import org.appointmentschedulingsystem.util.validation.GlobalValidation;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +44,7 @@ public class ServiceProviderService {
     public ServiceProviderDto addServiceProvider(ServiceProviderDto serviceProviderDTO) {
         ServiceProvider serviceProvider1 = ServiceProviderRepository.findByEmail(serviceProviderDTO.getEmail());
         if (serviceProvider1 != null) {
-            throw new Exception("ServiceProvider UserName Already Exists: " + serviceProviderDTO.getEmail());
+            throw new ServiceProviderNotFound("ServiceProvider UserName Already Exists: " + serviceProviderDTO.getEmail());
         }
         ServiceProvider serviceProvider = ServiceProviderMapper.INSTANCE.mapToEntity(serviceProviderDTO);
         serviceProvider.setRole(Role.SERVICE_PROVIDER);
@@ -58,7 +59,7 @@ public class ServiceProviderService {
 
     public List<ServiceProviderDto> serviceProviderById(String id) {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service provider not found" + " : " + id));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service provider not found" + " : " + id));
         List<Appointment> appointments = serviceProvider.getAppointments();
         for (Appointment appointment : appointments) {
             appointment.setId(appointment.getId());
@@ -69,7 +70,7 @@ public class ServiceProviderService {
 
     public void deleteProfession(String id) {
         ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service provider not found" + " : " + id));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service provider not found" + " : " + id));
         ServiceProviderRepository.deleteById(id);
     }
 
@@ -88,7 +89,7 @@ public class ServiceProviderService {
     public AvailableWeekDayDto addSingleAvailableWeekDay(String id, AvailableWeekDayDto availableWeekDayDTO) {
         AvailableWeekDay availableWeekDay = AvailableWeekDayMapper.INSTANCE.DTOToMap(availableWeekDayDTO);
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Professional Not Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Professional Not Found"));
         List<AvailableWeekDay> existingWeekDays = serviceProvider.getAvailableWeekDay();
         existingWeekDays.sort(Comparator.comparingInt(day -> getDayOfWeekNumber(day.getDay())));
         boolean matchFound = existingWeekDays.stream()
@@ -130,7 +131,7 @@ public class ServiceProviderService {
 
     public void deleteDayAndTime(String id, String day) {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Professional Not Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<AvailableWeekDay> availableWeekDay = serviceProvider.getAvailableWeekDay();
         if (availableWeekDay.isEmpty()) {
             throw new Exception("Service Provider Not Found AvailableWeekDay !! ");
@@ -143,7 +144,7 @@ public class ServiceProviderService {
     public AvailableWeekDayDto updateDayAndTime(String id, AvailableWeekDayDto availableWeekDayDTO) {
         AvailableWeekDay availableWeekDay = AvailableWeekDayMapper.INSTANCE.DTOToMap(availableWeekDayDTO);
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Professional Not Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<AvailableWeekDay> availableWeekDays = serviceProvider.getAvailableWeekDay();
         for (AvailableWeekDay Day : availableWeekDays) {
             if (Day.getDay().equalsIgnoreCase(availableWeekDay.getDay())) {
@@ -161,7 +162,7 @@ public class ServiceProviderService {
     //  getAllDayAndTime detail
     public List<AvailableWeekDayDto> getAvailableWeekDayDetail(String id) {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Professional Not Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<AvailableWeekDay> availableWeekDay = serviceProvider.getAvailableWeekDay();
         if (availableWeekDay.isEmpty()) {
             throw new Exception("Service Provider not Available !!");
@@ -173,7 +174,7 @@ public class ServiceProviderService {
     public OffDayDto addOffDay(String id, OffDayDto offDayDTO) {
         OffDay offDayData = OffDayMapper.INSTANCE.OffDayDTOToOffDay(offDayDTO);
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service Provider not found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider not found"));
         boolean exist = serviceProvider.getOffDay()
                 .stream()
                 .anyMatch(offDay -> offDay.getType().equals(offDayData.getType()));
@@ -204,7 +205,7 @@ public class ServiceProviderService {
     public List<OffDayDto> updateOffDay(String id, List<OffDayDto> offDayDTOList) {
         List<OffDay> list = OffDayMapper.INSTANCE.OffDayDTOsToOffDays(offDayDTOList);
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Id not found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<OffDay> existingOffDays = serviceProvider.getOffDay();
         for (OffDay updatedOffDay : list) {
             for (OffDay existingOffDay : existingOffDays) {
@@ -226,7 +227,7 @@ public class ServiceProviderService {
     public OffDayDto updateOffDay(String id, OffDayDto offDayDTO) {
         OffDay offDay = OffDayMapper.INSTANCE.OffDayDTOToOffDay(offDayDTO);
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Id not found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<OffDay> offDays = serviceProvider.getOffDay();
         for (OffDay type : offDays) {
             if (type.getType().equals(offDay.getType())) {
@@ -244,7 +245,7 @@ public class ServiceProviderService {
     //delete of days
     public void deleteOffDay(String id, HolidayType type) {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Id not found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<OffDay> offDay = serviceProvider.getOffDay();
         if (offDay.isEmpty()) {
             throw new Exception("Holiday Type is Not Found !!");
@@ -256,7 +257,7 @@ public class ServiceProviderService {
     // get all offDay details
     public List<OffDayDto> getOffDayDetails(String id) {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Id not found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<OffDay> offDay = serviceProvider.getOffDay();
         if (offDay.isEmpty()) {
             throw new Exception("Service Provider OffDay NOT Record !!");
@@ -268,7 +269,7 @@ public class ServiceProviderService {
     public LocationDto addProfessionalLocation(String id, LocationDto locationDTO) {
         Location location = LocationMapper.INSTANCE.locationDTOToLocation(locationDTO);
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service Provider ID NOT Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         location.setType(location.getType());
         location.setCoordinates(location.getCoordinates());
         serviceProvider.setLocation(location);
@@ -278,7 +279,7 @@ public class ServiceProviderService {
 
     public LocationDto updateProfessionLocation(String id, LocationDto locationDTO) {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service Provider ID NOT Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         Location location = LocationMapper.INSTANCE.locationDTOToLocation(locationDTO);
         if (serviceProvider.getLocation().equals(location)) {
             throw new Exception("Location is same as existing location.");
@@ -292,7 +293,7 @@ public class ServiceProviderService {
     public List<BreakTimeDto> addBreakTime(String id, String day, List<BreakTimeDto> breakTimeDTO) {
         List<BreakTime> breakTimes = BreakTimeMapper.INSTANCE.breakTimeDTOListToBreakTimeList(breakTimeDTO);
         ServiceProvider professional = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service Provider ID NOT Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<AvailableWeekDay> availableWeekDays = professional.getAvailableWeekDay();
         Optional<AvailableWeekDay> optionalAvailableWeekDay = availableWeekDays.stream()
                 .filter(availableWeekDay -> availableWeekDay.getDay().equalsIgnoreCase(day))
@@ -315,7 +316,7 @@ public class ServiceProviderService {
     //delete breakTime
     public void deleteBreakTimes(String id, String title, String day) {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service provider with the given ID not found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         for (AvailableWeekDay availableWeekDay : serviceProvider.getAvailableWeekDay()) {
             if (availableWeekDay.getDay().equalsIgnoreCase(day)) {
                 List<BreakTime> breakTimes = availableWeekDay.getBreakTime();
@@ -333,13 +334,13 @@ public class ServiceProviderService {
     public List<BreakTimeDto> updateBreakTime(String id, String day, List<BreakTimeDto> breakTimeDTOS) {
         List<BreakTime> breakTimes = BreakTimeMapper.INSTANCE.breakTimeDTOListToBreakTimeList(breakTimeDTOS);
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service Provider NOT Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         List<AvailableWeekDay> availableWeekDays = serviceProvider.getAvailableWeekDay();
         AvailableWeekDay availableWeekDay = availableWeekDays
                 .stream()
                 .filter(availableWeekDay1 -> availableWeekDay1.getDay().equalsIgnoreCase(day))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No AvailableWeekDay found for the provided day."));
+                .orElseThrow(() -> new Exception("No AvailableWeekDay found for the provided day."));
         availableWeekDay.setBreakTime(breakTimes);
         ServiceProviderRepository.save(serviceProvider);
         return BreakTimeMapper.INSTANCE.breakTimeListToBreakTimeDTOList(breakTimes);
@@ -347,7 +348,7 @@ public class ServiceProviderService {
 
     public void deleteLocation(String id, String type) {
         ServiceProvider serviceProvider = ServiceProviderRepository.findById(id)
-                .orElseThrow(() -> new Exception("Service Provider NOT Found"));
+                .orElseThrow(() -> new ServiceProviderNotFound("Service Provider Not Found !!"));
         Location location = serviceProvider.getLocation();
         if (location != null && location.getType().equals(type)) {
             location.setCoordinates(Arrays.asList(0.0, 0.0));

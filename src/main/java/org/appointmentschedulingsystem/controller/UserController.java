@@ -1,19 +1,16 @@
 package org.appointmentschedulingsystem.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.appointmentschedulingsystem.dtos.AppointmentDto;
 import org.appointmentschedulingsystem.dtos.LocationDto;
 import org.appointmentschedulingsystem.dtos.ServiceProviderDto;
 import org.appointmentschedulingsystem.dtos.UserDto;
-import org.appointmentschedulingsystem.services.AppointmentService;
-import org.appointmentschedulingsystem.services.UserService;
+import org.appointmentschedulingsystem.services.AppointmentServiceImp;
+import org.appointmentschedulingsystem.services.UserServiceImp;
 import org.appointmentschedulingsystem.util.enums.ProfessionType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,8 +22,8 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
 
-    private final UserService userService;
-    private final AppointmentService appointmentService;
+    private final UserServiceImp userServiceImp;
+    private final AppointmentServiceImp appointmentServiceImp;
 
     @PostMapping("/user-add")
     public ResponseEntity<UserDto> registerUser(
@@ -34,27 +31,27 @@ public class UserController {
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
             ObjectMapper objectMapper = new ObjectMapper();
             UserDto userDto = objectMapper.readValue(userDtoString, UserDto.class);
-            return ResponseEntity.ok(userService.addUser(userDto, image));
+            return ResponseEntity.ok(userServiceImp.addUser(userDto, image));
     }
 
     @GetMapping("/get-user")
     public ResponseEntity<List<UserDto>> getUser() {
-        return ResponseEntity.ok(userService.getAllUserDetail());
+        return ResponseEntity.ok(userServiceImp.getAllUserDetail());
     }
 
     @GetMapping("/get-user/{id}")
     public ResponseEntity<List<UserDto>> getUser(@PathVariable("id") String id) {
-        return ResponseEntity.ok(userService.getUserDetail(id));
+        return ResponseEntity.ok(userServiceImp.getUserDetail(id));
     }
 
     @PatchMapping("/user-update/{email}")
     public ResponseEntity<UserDto> updateUser(@PathVariable("email") String email, @RequestBody UserDto userDto) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.userUpdate(email, userDto));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userServiceImp.userUpdate(email, userDto));
     }
 
     @DeleteMapping("/user-delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") String id) {
-        userService.deleteUser(id);
+        userServiceImp.deleteUser(id);
         return ResponseEntity.ok().build();
     }
 
@@ -63,7 +60,7 @@ public class UserController {
             @PathVariable("id") String id,
             @RequestBody LocationDto locationDTO
     ) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.addLocation(id, locationDTO));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userServiceImp.addLocation(id, locationDTO));
     }
 
     @PatchMapping("/update-location/{id}")
@@ -71,12 +68,12 @@ public class UserController {
             @PathVariable("id") String id,
             @RequestBody LocationDto locationDTO
     ) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.updateLocation(id, locationDTO));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userServiceImp.updateLocation(id, locationDTO));
     }
 
     @DeleteMapping("/delete-location/{id}/{type}")
     public ResponseEntity<String> deleteLocation(@PathVariable("id") String id, @PathVariable("type") String type) {
-        userService.deleteLocation(id, type);
+        userServiceImp.deleteLocation(id, type);
         return ResponseEntity.ok("Deleted location");
     }
 
@@ -86,12 +83,12 @@ public class UserController {
             @PathVariable("sid") String sid,
             @RequestBody AppointmentDto appointmentDTO
     ) {
-        return ResponseEntity.ok(appointmentService.bookAppointment(uid, sid, appointmentDTO));
+        return ResponseEntity.ok(appointmentServiceImp.bookAppointment(uid, sid, appointmentDTO));
     }
 
     @DeleteMapping("/delete-appointment/{id}")
     public ResponseEntity<String> deleteAppointment(@PathVariable("id") String id) {
-        appointmentService.removeAppointment(id);
+        appointmentServiceImp.removeAppointment(id);
         return ResponseEntity.ok().build();
     }
 
@@ -101,12 +98,12 @@ public class UserController {
             @RequestBody AppointmentDto appointmentDTO
     ) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(appointmentService.updateAppointment(id, appointmentDTO));
+                .body(appointmentServiceImp.updateAppointment(id, appointmentDTO));
     }
 
     @GetMapping("/all-appointment")
     public ResponseEntity<List<AppointmentDto>> getAllAppointment() {
-        return ResponseEntity.ok(appointmentService.getAppointments());
+        return ResponseEntity.ok(appointmentServiceImp.getAppointments());
     }
 
     @GetMapping("/get-near-service-provider/{email}/{professionType}/{maxDistance}")
@@ -115,14 +112,14 @@ public class UserController {
             @PathVariable("professionType") ProfessionType professionType,
             @PathVariable("maxDistance") int maxDistance
     ) {
-        return ResponseEntity.ok(userService.findNearbyServiceProviders(email, professionType, maxDistance));
+        return ResponseEntity.ok(userServiceImp.findNearbyServiceProviders(email, professionType, maxDistance));
     }
 
     @GetMapping("/profession-name-by-service-provider/{professionName}")
     public ResponseEntity<List<ServiceProviderDto>> searchByProfession(
             @PathVariable("professionName") ProfessionType professionName
     ) {
-        return ResponseEntity.ok(userService.searchByProfession(professionName));
+        return ResponseEntity.ok(userServiceImp.searchByProfession(professionName));
     }
 
 }
